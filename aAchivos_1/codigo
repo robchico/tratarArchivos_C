@@ -1,0 +1,251 @@
+
+void Guardar(tRegLista *reg)
+{
+    FILE *pfichero;
+    int i;
+    pfichero=fopen("BIBLIOTECA.DAT","w+b");
+    if(pfichero!=NULL){
+        fwrite(reg->contador,sizeof(reg->contador),1,pfichero);
+        for(i=0;i<reg->contador;i++){
+            fwrite(&reg[i],sizeof(reg[i]),1,pfichero);
+        }
+    }
+    fclose(pfichero);
+}
+void Cargar(tRegLista *reg)
+{
+    FILE *pfichero;
+    pfichero=fopen("BIBLIOTECA.DAT","rb");
+    if(pfichero!=NULL){
+        fread(&reg->contador,sizeof(reg->contador),1,pfichero);
+        while(!feof(pfichero)){
+            fread(&reg[reg->contador],sizeof(reg[reg->contador]),1,pfichero);
+            reg->contador++;
+        }
+        reg->contador--;
+    }
+    fclose(pfichero);
+}
+
+typedef struct
+{
+    char nomEditorial[50];
+    int numPagina;
+
+} tRegLibros;
+
+typedef struct
+{
+    char nomRevista[50];
+    int numRevista;
+    int paginaInicio;
+
+} tRegArticulos;
+
+typedef struct
+{
+    char titulo[50];
+    char autor[50];
+    char idEjemplar[5];
+    int anioPubli;
+    int prestado;
+    char fecha[20];
+    char dniSocio[9];
+    char clave[4];
+
+    union
+        uTipo
+    {
+        tRegArticulos articulo;
+        tRegLibros libro;
+    } uTipo;
+} tRegEjemplares;
+
+typedef struct
+{
+    tRegEjemplares ejemplar[100];
+    int contador;
+    int contadorLibros;
+    int contadorArticulo;
+} tRegLista;
+
+void Cargar(tRegLista *reg)
+{
+    FILE *pfichero;
+    pfichero=fopen("BIBLIOTECA.DAT","rb");
+    if(pfichero!=NULL){
+        int numRegistros;
+        fread(&numRegistros,sizeof(numRegistros),1,pfichero);
+        reg->contador = 0; // Importante!!!
+        while(!feof(pfichero)){
+            fread(&reg->ejemplar[reg->contador],sizeof(tRegEjemplares),1,pfichero);
+            reg->contador++;
+        }
+
+        reg->contador--; // <<--- AQUI
+
+        if( reg->contador != numRegistros )
+        {
+          // Por si quieres mostrar un error por haber una inconsistencia
+        }
+        fclose(pfichero);
+    }
+}
+
+void Cargar(tRegLista *reg)
+{
+    FILE *pfichero;
+    pfichero=fopen("BIBLIOTECA.DAT","rb");
+    if(pfichero!=NULL){
+        int numRegistros;
+        fread(&numRegistros,sizeof(numRegistros),1,pfichero);
+        reg->contador = 0;
+        if(!feof(pfichero)){ // Por si acaso el fichero está vacío
+          while(1) {
+            fread(&reg->ejemplar[reg->contador],sizeof(tRegEjemplares),1,pfichero);
+            if(feof(pfichero)) break;
+            reg->contador++;
+          }
+        }
+
+        if( reg->contador != numRegistros )
+        {
+          // Por si quieres mostrar un error por haber una inconsistencia
+        }
+        fclose(pfichero);
+    }
+}
+struct datos{
+       char nombre[15];
+       char apellidos[30];
+       };
+void guardaFichero(struct datos *users){
+       FILE *archivo=fopen("usuarios.txt","a");
+       //como tendria q poner para guardar la estructura en el fichero archivo?
+      fclose(archivo);
+}
+int main(void){
+       struct datos usuarios;
+       guardaFichero(usuarios);
+
+       return 0;
+}
+--------------------------------------------------------------
+--------------------------------------------------------------------
+#include <stdio.h>
+#include <string.h>
+
+#define N 200
+
+struct productos{
+	char codigoLeidoFichero[50];
+	char nombre[50];
+	double precio;
+};
+
+
+
+
+int leerFichero(struct productos prod[])
+{
+	int i=0;
+	FILE*f1=fopen("productos.txt","r");
+	if(f1==NULL)
+	{
+		printf("Error al abrir el archivo\n");
+		
+	}
+	else
+	{
+		while(!feof(f1))
+		{
+			fscanf(f1,"%s %s %lf\n",prod[i].codigoLeidoFichero,prod[i].nombre,&prod[i].precio);
+			i++;
+		}
+	}
+	fclose(f1);
+	return i;
+}
+
+void EscribirNuevoFichero(int i, struct productos prod[])
+{
+	char codigo[50];
+	int j=0;
+	FILE*f1=fopen("nuevo.txt","w");
+	while(j<=i)
+	{
+		fprintf(f1,"%s %s %lf\n",prod[j].codigoLeidoFichero,prod[j].nombre,prod[j].precio);
+		
+		if(strcmp(codigo,prod[j].codigoLeidoFichero)==0)
+		{
+			printf("El producto existe y es: %s %s %lf\n", prod[j].codigoLeidoFichero,prod[j].nombre,prod[j].precio);
+		}
+		else
+		{
+			printf("El producto no ha sido encontrado");
+		}
+		j++;
+	}
+	fclose(f1);
+}
+int main(void)
+{	
+	char codigo[50];
+	struct productos prod[N];
+	int i;
+	printf("Introduce codigo: ");
+	scanf("%s",codigo);
+	leerFichero(prod);
+	EscribirNuevoFichero(i,prod);
+	return 0;
+}
+/////////////////////////////
+////////////////**/////////////
+/*
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define DIM 100
+char * gets (char *);
+
+struct persona {
+    char nombre[20];
+    char apellido[20];
+    int edad;
+} lista[DIM];
+
+void pedir_datos() {
+
+    for (int i = 0; i < DIM; i++) {
+
+        fflush(stdin);
+        printf("Nombre de la persona % d : \n", i + 1);
+        gets(lista[i].nombre);
+
+        fflush(stdin);
+        printf("Apellido de la persona % d : \n", i + 1);
+        gets(lista[i].apellido);
+
+        fflush(stdin);
+        printf("Edad de la persona % d : \n", i + 1);
+        scanf(" % d", &lista[i].edad);
+    }
+}
+
+void mostrar_datos() {
+
+    printf("\n\nMOSTRAR DATOS\n");
+
+    for (int i = 0; i < DIM; i++) {
+
+        printf("\nNombre de la persona % d : ", i + 1);
+        puts(lista[i].nombre);
+
+        printf("\nApellido de la persona %d : ", i + 1);
+        puts(lista[i].apellido);
+
+        printf("\nEdad de la persona % d : % d ", i + 1, lista[i].edad);
+        printf("\n\n");
+    }
+}*/
